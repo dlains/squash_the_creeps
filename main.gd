@@ -5,6 +5,7 @@ extends Node
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	$UserInterface/Retry.hide()
 	randomize()
 
 
@@ -29,6 +30,14 @@ func _on_mob_timer_timeout():
 	# Spawn the mob by adding it to the Main scene.
 	add_child(mob)
 
+	# We connect the mob to the score label to update the score upon squashing one.
+	mob.squashed.connect($UserInterface/ScoreLabel._on_Mob_squashed.bind())
 
 func _on_player_hit():
+	$UserInterface/Retry.show()
 	$MobTimer.stop()
+
+func _unhandled_input(event):
+	if event.is_action_pressed("ui_accept") and $UserInterface/Retry.visible:
+		# This restarts the current scene.
+		get_tree().reload_current_scene()
